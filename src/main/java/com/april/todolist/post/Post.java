@@ -8,9 +8,9 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
 public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -25,4 +25,13 @@ public class Post {
     @Temporal(TemporalType.DATE)
     @Column
     private Date createDate;
+
+    public Post(String subject, String content) {
+        this.subject = subject;
+        this.content = content;
+    }
+
+    void initCreateDate() {
+        this.createDate = new Date();
+    }
 }
