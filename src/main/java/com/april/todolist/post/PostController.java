@@ -1,13 +1,13 @@
 package com.april.todolist.post;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/post")
+@RequestMapping("/posts")
 public class PostController {
-
     private final PostService postService;
 
     private final PostRepository postRepository;
@@ -18,12 +18,13 @@ public class PostController {
     }
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public Post savePost(@RequestBody Post post) {
         return this.postService.save(post);
     }
 
     @GetMapping
-    public List<Post> findAll() {
-        return this.postRepository.findAll();
+    public List<Post> findBySubject(String subject) {
+        return this.postRepository.findBySubject(subject);
     }
 }
