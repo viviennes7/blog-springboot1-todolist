@@ -34,6 +34,8 @@ public class Post {
     }
 
     void setPrefixIdAtSubject() {
-        this.subject = format("%s. %s", this.id, this.subject);
+        if (!this.subject.contains(".")) {
+            this.subject = format("%s. %s", this.id, this.subject);
+        }
     }
 }

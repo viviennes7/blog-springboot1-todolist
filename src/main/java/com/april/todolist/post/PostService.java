@@ -20,4 +20,9 @@ public class PostService {
         this.postRepository.save(savedPost);
         return savedPost;
     }
+
+    public Post updatePost(Post post) {
+        post.setPrefixIdAtSubject();
+        return this.postRepository.save(post);
+    }
 }

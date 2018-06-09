@@ -26,7 +26,7 @@ public class PostServiceTest {
     }
 
     @Test
-    public void save() {
+    public void save() throws InterruptedException {
         Date start = new Date();
 
         given(this.postRepository.save(any(Post.class)))
@@ -34,9 +34,19 @@ public class PostServiceTest {
 
         Post savedPost = this.postService.save(new Post("블로그 작성", "Spring 기본원리 작성"));
 
+        Thread.sleep(1000);
         assertThat(savedPost.getId()).isEqualTo(1L);
         assertThat(savedPost.getSubject()).isEqualTo("1. 블로그 작성");
         assertThat(savedPost.getContent()).isEqualTo("Spring 기본원리 작성");
         assertThat(savedPost.getCreateDate()).isBetween(start, new Date());
+    }
+
+    @Test
+    public void updatePost() {
+        given(this.postRepository.save(any(Post.class)))
+                .willReturn(new Post(1L, "1. 블로그 작성", "Spring 기본원리 작성", new Date(), false));
+        Post savedPost = this.postService.save(new Post("블로그 작성", "Spring 기본원리 작성"));
+
+        assertThat(savedPost.getSubject()).isEqualTo("1. 블로그 작성");
     }
 }

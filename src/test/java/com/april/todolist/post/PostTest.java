@@ -9,10 +9,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class PostTest {
 
     @Test
-    public void initCreateDate() {
+    public void initCreateDate() throws InterruptedException {
         Date startDate = new Date();
         Post post = new Post();
         post.initCreateDate();
+
+        Thread.sleep(1000);
         assertThat(post.getCreateDate()).isBetween(startDate, new Date());
     }
 
@@ -23,5 +25,13 @@ public class PostTest {
         post.setSubject("제목");
         post.setPrefixIdAtSubject();
         assertThat(post.getSubject()).isEqualTo("5. 제목");
+    }
+
+    @Test
+    public void setPrefixIdAtSubject_제목전에_ID가_있는_경우() {
+        Post post = new Post();
+        post.setSubject("4. 블로그");
+        post.setPrefixIdAtSubject();
+        assertThat(post.getSubject()).isEqualTo("4. 블로그");
     }
 }

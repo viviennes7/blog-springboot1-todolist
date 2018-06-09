@@ -15,18 +15,15 @@ import java.util.Date;
 
 import static java.util.Arrays.asList;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.doThrow;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(PostController.class)
 public class PostControllerTest {
-
     @Autowired
     private MockMvc mvc;
 
@@ -55,12 +52,37 @@ public class PostControllerTest {
     }
 
     @Test
-    public void savedPost_subject가_Empty인_경우() throws Exception {
+    public void savePost_subject가_Empty인_경우() throws Exception {
         this.mvc.perform(post("/posts")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("\"content\" : \"Spring 기본원리\"}"))
                 .andExpect(status().isBadRequest())
                 .andDo(print());
+    }
+
+    @Test
+    public void savePost_subject에_마침표가_포함된_경우() throws Exception {
+        this.mvc.perform(post("/posts")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"subject\" : \"블로그.작성\", \"content\" : \"Spring 기본원리\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("제목에 '.'을 넣을 수 없습니다."))
+                .andDo(print());
+    }
+
+    @Test
+    public void deletePost() throws Exception {
+        this.mvc.perform(delete("/posts/{id}", 1L))
+                .andExpect(content().string("true"));
+    }
+
+    @Test
+    public void deletePost_실패한_경우() throws Exception {
+        doThrow(Exception.class)
+                .when(this.postRepository).delete(anyLong());
+
+        this.mvc.perform(delete("/posts/{id}", 1L))
+                .andExpect(content().string("false"));
     }
 
     @Test
@@ -71,7 +93,7 @@ public class PostControllerTest {
         given(this.postRepository.findBySubject(anyString()))
                 .willReturn(asList(post1, post2));
 
-        this.mvc.perform(get("/posts").param("subject", "블로그"))
+        this.mvc.perform(get("/posts/subjects/{subject}", "블로그"))
                 .andExpect(jsonPath("$.size()").value(2))
                 .andExpect(jsonPath("$.[0].subject").value("블로그"))
                 .andDo(print());
