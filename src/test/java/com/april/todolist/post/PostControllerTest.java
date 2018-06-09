@@ -2,9 +2,11 @@ package com.april.todolist.post;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -34,10 +36,13 @@ public class PostControllerTest {
     @MockBean
     private PostRepository postRepository;
 
+    @SpyBean
+    private ModelMapper modelMapper;
+
     @Test
     public void savePost() throws Exception {
         given(this.postService.save(any(Post.class)))
-                .willReturn(new Post(1L, "1. 블로그 작성", "Spring 기본원리", new Date()));
+                .willReturn(new Post(1L, "1. 블로그 작성", "Spring 기본원리", new Date(), false));
 
         this.mvc.perform(post("/posts")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -50,9 +55,18 @@ public class PostControllerTest {
     }
 
     @Test
+    public void savedPost_subject가_Empty인_경우() throws Exception {
+        this.mvc.perform(post("/posts")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("\"content\" : \"Spring 기본원리\"}"))
+                .andExpect(status().isBadRequest())
+                .andDo(print());
+    }
+
+    @Test
     public void findBySubject() throws Exception {
-        Post post1 = new Post(1L, "블로그", "Spring 기본원리", new Date());
-        Post post2 = new Post(2L, "블로그", "DDD", new Date());
+        Post post1 = new Post(1L, "블로그", "Spring 기본원리", new Date(), false);
+        Post post2 = new Post(2L, "블로그", "DDD", new Date(), false);
 
         given(this.postRepository.findBySubject(anyString()))
                 .willReturn(asList(post1, post2));

@@ -30,7 +30,7 @@ public class PostServiceTest {
         Date start = new Date();
 
         given(this.postRepository.save(any(Post.class)))
-                .willReturn(new Post(1L, "블로그 작성", "Spring 기본원리 작성", null));
+                .willReturn(new Post(1L, "블로그 작성", "Spring 기본원리 작성", null, false));
 
         Post savedPost = this.postService.save(new Post("블로그 작성", "Spring 기본원리 작성"));
 
