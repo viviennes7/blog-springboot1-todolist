@@ -11,6 +11,7 @@ import java.util.Date;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PostServiceTest {
@@ -48,5 +49,15 @@ public class PostServiceTest {
         Post savedPost = this.postService.save(new Post("블로그 작성", "Spring 기본원리 작성"));
 
         assertThat(savedPost.getSubject()).isEqualTo("1. 블로그 작성");
+    }
+
+    @Test
+    public void changeIsSuccess() {
+        given(this.postRepository.findOne(anyLong()))
+                .willReturn(new Post(1L, "1. 블로그 작성", "Spring 기본원리 작성", new Date(), false));
+
+        boolean result = this.postService.changeIsSuccess(1L);
+
+        assertThat(result).isTrue();
     }
 }

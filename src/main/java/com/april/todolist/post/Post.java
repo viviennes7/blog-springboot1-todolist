@@ -38,4 +38,8 @@ public class Post {
             this.subject = format("%s. %s", this.id, this.subject);
         }
     }
+
+    void changeIsSuccess() {
+        this.isSuccess = this.isSuccess ? false : true;
+    }
 }

@@ -1,13 +1,16 @@
 package com.april.todolist.post;
 
 import com.april.todolist.common.error.ValidationException;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/posts")
 public class PostController {
@@ -23,7 +26,7 @@ public class PostController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Post savePost(@RequestBody @Valid PostDto postDto) {
+    public Post savePost(@RequestBody @Validated PostDto postDto) {
         if (postDto.getSubject().contains("."))
             throw new ValidationException("제목에 '.'을 넣을 수 없습니다.");
 
@@ -36,7 +39,7 @@ public class PostController {
     }
 
     @PutMapping("/{id}")
-    public Post updatePost(@PathVariable Long id, @Valid PostDto postDto) {
+    public Post updatePost(@PathVariable Long id, @Valid @RequestBody PostDto postDto) {
         postDto.setId(id);
         return this.postService.updatePost(this.modelmapper.map(postDto, Post.class));
     }
@@ -47,6 +50,7 @@ public class PostController {
         try {
             this.postRepository.delete(id);
         } catch (Exception e) {
+            log.error(e.getMessage());
             result = false;
         }
         return result;
@@ -57,8 +61,14 @@ public class PostController {
         return this.postRepository.findBySubject(subject);
     }
 
+    @PatchMapping("/{id}/issuccess")
+    public boolean changeIsSuccess(@PathVariable Long id) {
+        return this.postService.changeIsSuccess(id);
+    }
+
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(ValidationException.class)    public String validation(ValidationException e) {
+    @ExceptionHandler(ValidationException.class)
+    private String validation(ValidationException e) {
         return e.getMessage();
     }
 }

@@ -34,4 +34,19 @@ public class PostTest {
         post.setPrefixIdAtSubject();
         assertThat(post.getSubject()).isEqualTo("4. 블로그");
     }
+
+    @Test
+    public void changeIsSuccess_현재_false인_경우() {
+        Post post = new Post();
+        post.changeIsSuccess();
+        assertThat(post.isSuccess()).isTrue();
+    }
+
+    @Test
+    public void changeIsSuccess_현재_true인_경우() {
+        Post post = new Post();
+        post.setSuccess(true);
+        post.changeIsSuccess();
+        assertThat(post.isSuccess()).isFalse();
+    }
 }

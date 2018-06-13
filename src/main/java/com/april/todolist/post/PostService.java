@@ -25,4 +25,11 @@ public class PostService {
         post.setPrefixIdAtSubject();
         return this.postRepository.save(post);
     }
+
+    public boolean changeIsSuccess(Long id) {
+        Post post = this.postRepository.findOne(id);
+        post.changeIsSuccess();
+        this.postRepository.save(post);
+        return post.isSuccess();
+    }
 }
